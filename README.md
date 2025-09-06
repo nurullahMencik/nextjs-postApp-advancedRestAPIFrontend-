@@ -3,7 +3,7 @@
 Bu proje, gelişmiş bir REST API'nin ön uç istemcisidir. Next.js, durum yönetimi için Redux Toolkit ve API iletişimi için Axios kullanılarak geliştirilmiştir. Uygulama, kullanıcı kimlik doğrulama (kayıt ve giriş) ve postlar için CRUD (Oluşturma, Okuma, Güncelleme, Silme) işlemlerini yönetir.
 
 ## Projenin canlı adresi 
-
+https://nextjs-post-app-advanced-rest-api-f.vercel.app
 
 ## Proje Yapısı
 
