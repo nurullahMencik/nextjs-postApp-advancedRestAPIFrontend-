@@ -9,11 +9,25 @@ const initialState = {
 
 const BASE_URL = "https://advancedrestapi-nodejs.onrender.com/api/post";
 
+// Axios interceptor'ı oluştur. Bu, her isteğe otomatik olarak token ekler.
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const createTodo = createAsyncThunk("create", async (data, thunkAPI) => {
   try {
     const res = await axios.post(`${BASE_URL}/create`, data);
-    if (res.data.status == "OK") {
-      alert("post oluşturma işlemi başarılı");
+    if (res.data.status === "OK") {
+      console.log("Post oluşturma işlemi başarılı.");
     }
     return res.data.newPost;
   } catch (error) {
@@ -26,8 +40,8 @@ export const fetchPosts = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const res = await axios.get(`${BASE_URL}/getAll`);
-      if (res.data.status == "OK") {
-        console.log("postlar başarıyla getırıldı");
+      if (res.data.status === "OK") {
+        console.log("Postlar başarıyla getirildi.");
       }
       return res.data.posts;
     } catch (error) {
@@ -53,6 +67,7 @@ export const deletePost = createAsyncThunk(
   async (postId, thunkAPI) => {
     try {
       await axios.delete(`${BASE_URL}/delete/${postId}`);
+      console.log("Post silme işlemi başarılı.");
       return postId;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data.message);
@@ -64,8 +79,8 @@ export const updatePost = createAsyncThunk(
   async ({ data, postId }, thunkAPI) => {
     try {
       const res = await axios.put(`${BASE_URL}/update/${postId}`, data);
-      if (res.data.status == "OK") {
-        alert("postlar başarıyla guncellendi");
+      if (res.data.status === "OK") {
+        console.log("Post başarıyla güncellendi.");
       }
       return res.data.updatedPost;
     } catch (error) {
@@ -86,7 +101,7 @@ export const postSlice = createSlice({
       })
       .addCase(createTodo.rejected, (state, action) => {
         state.error = action.payload;
-        alert(state.error);
+        console.error("Post oluşturma hatası:", state.error);
       })
 
       //fetchPosts
@@ -95,7 +110,7 @@ export const postSlice = createSlice({
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.error = action.payload;
-        alert(state.error);
+        console.error("Post getirme hatası:", state.error);
       })
 
       //fetchPostDetails
@@ -104,7 +119,7 @@ export const postSlice = createSlice({
       })
       .addCase(fetchPostDetails.rejected, (state, action) => {
         state.error = action.payload;
-        alert(state.error);
+        console.error("Post detayları hatası:", state.error);
       })
 
       //delete
@@ -113,22 +128,20 @@ export const postSlice = createSlice({
       })
       .addCase(deletePost.rejected, (state, action) => {
         state.error = action.payload;
-        alert(state.error);
+        console.error("Post silme hatası:", state.error);
       })
       //update
       .addCase(updatePost.fulfilled, (state, action) => {
         state.posts = state.posts.map((post) =>
           post._id !== action.payload._id ? post : action.payload
         );
-        state.selectedPost=action.payload
+        state.selectedPost = action.payload;
       })
       .addCase(updatePost.rejected, (state, action) => {
         state.error = action.payload;
-        alert(state.error);
+        console.error("Post güncelleme hatası:", state.error);
       });
   },
 });
-
-//export const {  } = postSlice.actions;
 
 export default postSlice.reducer;
